@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.ecoguard.app">
+
+    <!-- Permissions requises pour EcoGuard V2 - Stratégie Proactive -->
+    
+    <!-- Permissions audio pour l'émission et l'écoute -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    
+    <!-- Permissions de localisation pour les observations -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    
+    <!-- Permissions réseau pour les rapports anonymes -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- Permissions pour les services en arrière-plan -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
+    <!-- Permissions pour les notifications push -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    
+    <!-- Permissions pour la gestion de l'énergie -->
+    <uses-permission android:name="android.permission.BATTERY_STATS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    
+    <!-- Fonctionnalités requises -->
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.location.network"
+        android:required="false" />
+
+    <application
+        android:name=".EcoGuardApplication_V2"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.EcoGuard"
+        android:requestLegacyExternalStorage="false"
+        android:usesCleartextTraffic="false"
+        tools:targetApi="31">
+
+        <!-- Activité principale -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.EcoGuard.NoActionBar"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Activité d'onboarding -->
+        <activity
+            android:name=".ui.OnboardingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EcoGuard.Onboarding"
+            android:screenOrientation="portrait" />
+
+        <!-- Activité de configuration -->
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EcoGuard"
+            android:parentActivityName=".ui.MainActivity" />
+
+        <!-- Service Firebase Cloud Messaging -->
+        <service
+            android:name=".receivers.EcoGuardMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Service de premier plan pour l'écoute passive -->
+        <service
+            android:name=".services.PassiveListeningService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <!-- Workers pour les tâches en arrière-plan -->
+        
+        <!-- Worker d'émission proactive -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+
+        <!-- Receivers pour les alertes et événements système -->
+        
+        <!-- Receiver pour les alertes d'appareils volés -->
+        <receiver
+            android:name=".receivers.LocalStolenDeviceAlertReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.ecoguard.app.STOLEN_DEVICE_ALERT" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Receiver pour le démarrage automatique -->
+        <receiver
+            android:name=".receivers.BootReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Receiver pour les changements de batterie -->
+        <receiver
+            android:name=".receivers.BatteryReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BATTERY_LOW" />
+                <action android:name="android.intent.action.BATTERY_OKAY" />
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Provider pour la base de données Room -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
+        <!-- Métadonnées Firebase -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimary" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
+
+        <!-- Configuration EcoGuard -->
+        <meta-data
+            android:name="com.ecoguard.app.VERSION"
+            android:value="2.0.0" />
+        <meta-data
+            android:name="com.ecoguard.app.PROTOCOL_VERSION"
+            android:value="ESP_2.0" />
+        <meta-data
+            android:name="com.ecoguard.app.STRATEGY"
+            android:value="PROACTIVE" />
+
+        <!-- Configuration des fréquences ultrasoniques -->
+        <meta-data
+            android:name="com.ecoguard.app.MIN_FREQUENCY"
+            android:value="18000" />
+        <meta-data
+            android:name="com.ecoguard.app.MAX_FREQUENCY"
+            android:value="22000" />
+        <meta-data
+            android:name="com.ecoguard.app.SAMPLE_RATE"
+            android:value="48000" />
+
+        <!-- Configuration de sécurité -->
+        <meta-data
+            android:name="com.ecoguard.app.ENCRYPTION_ENABLED"
+            android:value="true" />
+        <meta-data
+            android:name="com.ecoguard.app.ANONYMIZATION_LEVEL"
+            android:value="HIGH" />
+
+    </application>
+
+    <!-- Requêtes de packages pour Android 11+ -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
+
+</manifest>
+

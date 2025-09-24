@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoGuard Tracking Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/logo.png" alt="EcoGuard Logo" class="logo">
+                <h3>EcoGuard</h3>
+            </div>
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a href="#" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
+                </li>
+                <li>
+                    <a href="#" data-page="devices"><i class="fas fa-mobile-alt"></i> Mes appareils</a>
+                </li>
+                <li>
+                    <a href="#" data-page="report-theft"><i class="fas fa-exclamation-triangle"></i> Déclarer un vol</a>
+                </li>
+                <li>
+                    <a href="#" data-page="tracking"><i class="fas fa-map-marker-alt"></i> Tracking</a>
+                </li>
+                <li>
+                    <a href="#" data-page="settings"><i class="fas fa-cog"></i> Paramètres</a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navigation -->
+            <header class="top-nav">
+                <button id="sidebar-toggle" class="btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="user-info">
+                    <span class="user-name">Jean Dupont</span>
+                    <img src="assets/avatar.png" alt="User Avatar" class="avatar">
+                </div>
+            </header>
+
+            <!-- Content Container -->
+            <div class="content-container">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="content-page active">
+                    <h1>Tableau de bord</h1>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Attention :</strong> Votre appareil "Samsung Galaxy S22" a été signalé comme volé. <a href="#" data-page="tracking" class="alert-link">Voir le tracking</a>
+                    </div>
+
+                    <div class="row dashboard-stats">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-primary">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="stat-details">
+                                    <h3>3</h3>
+                                    <p>Appareils enregistrés</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-danger">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="stat-details">
+                                    <h3>1</h3>
+                                    <p>Appareil volé</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-success">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="stat-details">
+                                    <h3>12</h3>
+                                    <p>Observations récentes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-info">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-details">
+                                    <h3>Il y a 23 min</h3>
+                                    <p>Dernière observation</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Dernière position connue</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="mini-map" class="mini-map"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Appareils récemment actifs</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="device-list">
+                                        <li class="device-item">
+                                            <div class="device-icon bg-danger">
+                                                <i class="fas fa-mobile-alt"></i>
+                                            </div>
+                                            <div class="device-info">
+                                                <h6>Samsung Galaxy S22</h6>
+                                                <p class="text-danger">Volé - Dernière activité il y a 23 min</p>
+                                            </div>
+                                        </li>
+                                        <li class="device-item">
+                                            <div class="device-icon bg-success">
+                                                <i class="fas fa-tablet-alt"></i>
+                                            </div>
+                                            <div class="device-info">
+                                                <h6>iPad Pro</h6>
+                                                <p class="text-success">Actif - Dernière activité il y a 5 min</p>
+                                            </div>
+                                        </li>
+                                        <li class="device-item">
+                                            <div class="device-icon bg-success">
+                                                <i class="fas fa-laptop"></i>
+                                            </div>
+                                            <div class="device-info">
+                                                <h6>MacBook Pro</h6>
+                                                <p class="text-success">Actif - Dernière activité il y a 2h</p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Devices Page -->
+                <div id="devices-page" class="content-page">
+                    <h1>Mes appareils</h1>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5>Appareils enregistrés</h5>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Ajouter un appareil
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Appareil</th>
+                                            <th>Identifiant</th>
+                                            <th>Date d'enregistrement</th>
+                                            <th>Dernière activité</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="device-icon-sm bg-danger">
+                                                        <i class="fas fa-mobile-alt"></i>
+                                                    </div>
+                                                    <span class="ms-2">Samsung Galaxy S22</span>
+                                                </div>
+                                            </td>
+                                            <td><small class="text-muted">d8e8fca2dc0f896fd7cb4cb0031ba249</small></td>
+                                            <td>15/03/2025</td>
+                                            <td>Aujourd'hui, 14:37</td>
+                                            <td><span class="badge bg-danger">Volé</span></td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-sm btn-outline-primary" data-page="tracking">Tracker</button>
+                                                    <button class="btn btn-sm btn-outline-secondary">Détails</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="device-icon-sm bg-success">
+                                                        <i class="fas fa-tablet-alt"></i>
+                                                    </div>
+                                                    <span class="ms-2">iPad Pro</span>
+                                                </div>
+                                            </td>
+                                            <td><small class="text-muted">6c8349cc7260ae62e3b1396831a8398f</small></td>
+                                            <td>03/01/2025</td>
+                                            <td>Aujourd'hui, 14:55</td>
+                                            <td><span class="badge bg-success">Actif</span></td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-sm btn-outline-danger">Signaler volé</button>
+                                                    <button class="btn btn-sm btn-outline-secondary">Détails</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="device-icon-sm bg-success">
+                                                        <i class="fas fa-laptop"></i>
+                                                    </div>
+                                                    <span class="ms-2">MacBook Pro</span>
+                                                </div>
+                                            </td>
+                                            <td><small class="text-muted">d82c8d1619ad8176d665453cfb2e55f0</small></td>
+                                            <td>10/12/2024</td>
+                                            <td>Aujourd'hui, 13:10</td>
+                                            <td><span class="badge bg-success">Actif</span></td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-sm btn-outline-danger">Signaler volé</button>
+                                                    <button class="btn btn-sm btn-outline-secondary">Détails</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Theft Page -->
+                <div id="report-theft-page" class="content-page">
+                    <h1>Déclarer un vol</h1>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Formulaire de déclaration de vol</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="theft-report-form">
+                                <div class="mb-3">
+                                    <label for="device-select" class="form-label">Sélectionnez l'appareil</label>
+                                    <select class="form-select" id="device-select" required>
+                                        <option value="" selected disabled>Choisir un appareil</option>
+                                        <option value="ipad">iPad Pro</option>
+                                        <option value="macbook">MacBook Pro</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="theft-date" class="form-label">Date et heure approximative du vol</label>
+                                    <input type="datetime-local" class="form-control" id="theft-date" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="theft-location" class="form-label">Lieu du vol (si connu)</label>
+                                    <input type="text" class="form-control" id="theft-location" placeholder="Ex: 15 rue de la Paix, Paris">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="theft-circumstances" class="form-label">Circonstances du vol</label>
+                                    <textarea class="form-control" id="theft-circumstances" rows="3" placeholder="Décrivez brièvement les circonstances du vol..."></textarea>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="police-report-check">
+                                    <label class="form-check-label" for="police-report-check">J'ai déjà déposé une plainte auprès de la police</label>
+                                </div>
+                                <div class="mb-3" id="police-report-details" style="display: none;">
+                                    <label for="police-report-number" class="form-label">Numéro de dossier de police</label>
+                                    <input type="text" class="form-control" id="police-report-number">
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="terms-check" required>
+                                    <label class="form-check-label" for="terms-check">Je confirme que ces informations sont exactes et que l'appareil m'appartient</label>
+                                </div>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Information :</strong> Une fois le vol déclaré, le système EcoGuard activera le tracking communautaire pour localiser votre appareil. Vous recevrez des notifications lorsque votre appareil sera détecté.
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-danger">Déclarer le vol</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tracking Page -->
+                <div id="tracking-page" class="content-page">
+                    <h1>Tracking de l'appareil</h1>
+                    <div class="device-header">
+                        <div class="device-info">
+                            <div class="device-icon bg-danger">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div>
+                                <h2>Samsung Galaxy S22</h2>
+                                <p>Déclaré volé le 22/09/2025 à 10:15</p>
+                            </div>
+                        </div>
+                        <div class="device-actions">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fas fa-file-export"></i> Exporter le rapport
+                            </button>
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-share"></i> Partager avec la police
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="card mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5>Carte des observations</h5>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-secondary active">Toutes</button>
+                                        <button class="btn btn-sm btn-outline-secondary">24h</button>
+                                        <button class="btn btn-sm btn-outline-secondary">7 jours</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div id="tracking-map" class="tracking-map"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5>Statistiques</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Observations totales</span>
+                                        <span class="stat-value">12</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Dernière observation</span>
+                                        <span class="stat-value">Il y a 23 min</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Confiance moyenne</span>
+                                        <span class="stat-value">87%</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Appareils détecteurs</span>
+                                        <span class="stat-value">5</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Dernières observations</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="observation-list">
+                                        <li class="observation-item">
+                                            <div class="observation-time">14:37</div>
+                                            <div class="observation-details">
+                                                <h6>Rue de Rivoli, Paris</h6>
+                                                <p>Confiance: <span class="text-success">92%</span></p>
+                                            </div>
+                                        </li>
+                                        <li class="observation-item">
+                                            <div class="observation-time">14:12</div>
+                                            <div class="observation-details">
+                                                <h6>Place de la Concorde, Paris</h6>
+                                                <p>Confiance: <span class="text-success">89%</span></p>
+                                            </div>
+                                        </li>
+                                        <li class="observation-item">
+                                            <div class="observation-time">13:45</div>
+                                            <div class="observation-details">
+                                                <h6>Champs-Élysées, Paris</h6>
+                                                <p>Confiance: <span class="text-warning">76%</span></p>
+                                            </div>
+                                        </li>
+                                        <li class="observation-item">
+                                            <div class="observation-time">13:20</div>
+                                            <div class="observation-details">
+                                                <h6>Avenue Montaigne, Paris</h6>
+                                                <p>Confiance: <span class="text-success">85%</span></p>
+                                            </div>
+                                        </li>
+                                        <li class="observation-item">
+                                            <div class="observation-time">12:58</div>
+                                            <div class="observation-details">
+                                                <h6>Boulevard Haussmann, Paris</h6>
+                                                <p>Confiance: <span class="text-warning">72%</span></p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <div class="text-center p-2">
+                                        <a href="#" class="btn btn-sm btn-link">Voir toutes les observations</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Actions recommandées</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="action-card">
+                                        <div class="action-icon">
+                                            <i class="fas fa-lock"></i>
+                                        </div>
+                                        <h5>Verrouiller l'appareil</h5>
+                                        <p>Bloquez l'accès à votre appareil à distance</p>
+                                        <button class="btn btn-primary btn-sm">Verrouiller</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="action-card">
+                                        <div class="action-icon">
+                                            <i class="fas fa-eraser"></i>
+                                        </div>
+                                        <h5>Effacer les données</h5>
+                                        <p>Supprimez toutes les données personnelles</p>
+                                        <button class="btn btn-danger btn-sm">Effacer</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="action-card">
+                                        <div class="action-icon">
+                                            <i class="fas fa-volume-up"></i>
+                                        </div>
+                                        <h5>Faire sonner</h5>
+                                        <p>Déclenchez une alarme sonore sur l'appareil</p>
+                                        <button class="btn btn-warning btn-sm">Sonner</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="settings-page" class="content-page">
+                    <h1>Paramètres</h1>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Paramètres du compte</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="account-settings-form">
+                                <div class="mb-3">
+                                    <label for="account-name" class="form-label">Nom complet</label>
+                                    <input type="text" class="form-control" id="account-name" value="Jean Dupont">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="account-email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="account-email" value="jean.dupont@example.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="account-phone" class="form-label">Téléphone</label>
+                                    <input type="tel" class="form-control" id="account-phone" value="+33 6 12 34 56 78">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Paramètres de notification</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="notification-settings-form">
+                                <div class="mb-3 form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="email-notifications" checked>
+                                    <label class="form-check-label" for="email-notifications">Notifications par email</label>
+                                </div>
+                                <div class="mb-3 form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="sms-notifications" checked>
+                                    <label class="form-check-label" for="sms-notifications">Notifications par SMS</label>
+                                </div>
+                                <div class="mb-3 form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="push-notifications" checked>
+                                    <label class="form-check-label" for="push-notifications">Notifications push</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="notification-frequency" class="form-label">Fréquence des rapports</label>
+                                    <select class="form-select" id="notification-frequency">
+                                        <option value="realtime">Temps réel</option>
+                                        <option value="hourly" selected>Toutes les heures</option>
+                                        <option value="daily">Quotidien</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Enregistrer les préférences</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Sécurité</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="security-settings-form">
+                                <div class="mb-3">
+                                    <label for="current-password" class="form-label">Mot de passe actuel</label>
+                                    <input type="password" class="form-control" id="current-password">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-password" class="form-label">Nouveau mot de passe</label>
+                                    <input type="password" class="form-control" id="new-password">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirm-password" class="form-label">Confirmer le mot de passe</label>
+                                    <input type="password" class="form-control" id="confirm-password">
+                                </div>
+                                <div class="mb-3 form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="two-factor-auth" checked>
+                                    <label class="form-check-label" for="two-factor-auth">Authentification à deux facteurs</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Mettre à jour le mot de passe</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Connexion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label for="login-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="login-email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="login-password" class="form-label">Mot de passe</label>
+                            <input type="password" class="form-control" id="login-password" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember-me">
+                            <label class="form-check-label" for="remember-me">Se souvenir de moi</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Se connecter</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <a href="#" class="text-decoration-none">Mot de passe oublié ?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theft Report Success Modal -->
+    <div class="modal fade" id="theftReportSuccessModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Vol déclaré avec succès</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="success-icon mb-4">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4>Votre appareil a été signalé comme volé</h4>
+                    <p>Le système EcoGuard a activé le tracking communautaire pour votre appareil. Vous recevrez des notifications dès qu'il sera détecté.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary" data-page="tracking" data-bs-dismiss="modal">Voir le tracking</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

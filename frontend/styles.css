@@ -1,0 +1,452 @@
+/* Main Styles for EcoGuard Tracking Portal */
+:root {
+    --primary-color: #4CAF50;
+    --primary-dark: #2E7D32;
+    --primary-light: #C8E6C9;
+    --secondary-color: #607D8B;
+    --secondary-light: #B0BEC5;
+    --danger-color: #F44336;
+    --warning-color: #FFC107;
+    --success-color: #4CAF50;
+    --info-color: #2196F3;
+    --text-dark: #333333;
+    --text-light: #757575;
+    --bg-light: #F5F5F5;
+    --white: #FFFFFF;
+    --sidebar-width: 250px;
+    --header-height: 60px;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    margin: 0;
+    padding: 0;
+}
+
+/* App Container */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--white);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    height: 100vh;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+.sidebar-header {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--primary-light);
+}
+
+.sidebar-header .logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.sidebar-header h3 {
+    color: var(--primary-color);
+    margin: 0;
+    font-weight: 600;
+}
+
+.sidebar ul.components {
+    padding: 20px 0;
+    list-style: none;
+}
+
+.sidebar ul li a {
+    padding: 15px 20px;
+    display: block;
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li.active a {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.sidebar ul li a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid var(--primary-light);
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.sidebar-footer a {
+    color: var(--text-dark);
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s;
+}
+
+.sidebar-footer a:hover {
+    color: var(--primary-color);
+}
+
+/* Main Content */
+.main-content {
+    width: calc(100% - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+    transition: all 0.3s;
+}
+
+/* Top Navigation */
+.top-nav {
+    height: var(--header-height);
+    background-color: var(--white);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-name {
+    margin-right: 10px;
+    font-weight: 500;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Content Container */
+.content-container {
+    padding: 20px;
+}
+
+.content-page {
+    display: none;
+}
+
+.content-page.active {
+    display: block;
+}
+
+/* Dashboard Stats */
+.dashboard-stats {
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background-color: var(--white);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: var(--white);
+    font-size: 20px;
+}
+
+.bg-primary {
+    background-color: var(--primary-color);
+}
+
+.bg-danger {
+    background-color: var(--danger-color);
+}
+
+.bg-success {
+    background-color: var(--success-color);
+}
+
+.bg-info {
+    background-color: var(--info-color);
+}
+
+.bg-warning {
+    background-color: var(--warning-color);
+}
+
+.stat-details h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.stat-details p {
+    margin: 5px 0 0;
+    color: var(--text-light);
+}
+
+/* Mini Map */
+.mini-map {
+    height: 300px;
+    border-radius: 8px;
+    background-color: #e9ecef;
+}
+
+/* Device List */
+.device-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.device-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.device-item:last-child {
+    border-bottom: none;
+}
+
+.device-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: var(--white);
+    font-size: 16px;
+}
+
+.device-icon-sm {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 14px;
+}
+
+.device-info h6 {
+    margin: 0;
+    font-weight: 500;
+}
+
+.device-info p {
+    margin: 5px 0 0;
+    font-size: 14px;
+}
+
+/* Tracking Page */
+.device-header {
+    background-color: var(--white);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.device-header .device-info {
+    display: flex;
+    align-items: center;
+}
+
+.device-header .device-icon {
+    margin-right: 20px;
+}
+
+.device-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.device-header p {
+    margin: 5px 0 0;
+    color: var(--text-light);
+}
+
+.tracking-map {
+    height: 500px;
+    border-radius: 8px;
+    background-color: #e9ecef;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: var(--text-light);
+}
+
+.stat-value {
+    font-weight: 500;
+}
+
+/* Observation List */
+.observation-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.observation-item {
+    display: flex;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.observation-time {
+    font-weight: 500;
+    margin-right: 15px;
+    color: var(--text-light);
+    min-width: 50px;
+}
+
+.observation-details h6 {
+    margin: 0;
+    font-weight: 500;
+}
+
+.observation-details p {
+    margin: 5px 0 0;
+    font-size: 14px;
+}
+
+/* Action Cards */
+.action-card {
+    background-color: var(--white);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.action-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 15px;
+}
+
+.action-card h5 {
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.action-card p {
+    color: var(--text-light);
+    margin-bottom: 15px;
+    min-height: 40px;
+}
+
+/* Success Modal */
+.success-icon {
+    font-size: 60px;
+    color: var(--success-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        margin-left: -250px;
+    }
+    
+    .sidebar.active {
+        margin-left: 0;
+    }
+    
+    .main-content {
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    .main-content.active {
+        width: calc(100% - 250px);
+        margin-left: 250px;
+    }
+    
+    .device-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .device-actions {
+        margin-top: 15px;
+    }
+}
+
+/* Utility Classes */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+.text-success {
+    color: var(--success-color) !important;
+}
+
+.text-warning {
+    color: var(--warning-color) !important;
+}
+
+.text-info {
+    color: var(--info-color) !important;
+}
