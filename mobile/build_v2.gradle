@@ -294,3 +294,5 @@ task integrationTestV2 {
 // Exécuter le rapport après chaque build
 build.finalizedBy buildReportV2
 
+// Ajout de la dépendance JTransforms pour FFT optimisée
+implementation 'com.github.wendykierp:JTransforms:3.1'

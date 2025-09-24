@@ -1,3 +1,4 @@
+import androidx.core.content.ContextCompat
 package com.ecoguard.app.audio
 
 import android.content.Context
@@ -61,6 +62,11 @@ class OptimizedAudioEngine_V2(
      * Démarre le moteur audio pour l'écoute passive.
      */
     suspend fun startPassiveListening() {
+        if (!checkRequiredPermissions()) {
+            logRepository.logError("Permissions nécessaires non accordées")
+            _engineState.value = AudioEngineState.ERROR
+            return
+        }
         if (_engineState.value != AudioEngineState.STOPPED) return
 
         try {

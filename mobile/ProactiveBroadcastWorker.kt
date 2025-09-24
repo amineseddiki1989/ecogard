@@ -40,7 +40,7 @@ class ProactiveBroadcastWorker(
         private const val DEFAULT_SAMPLE_RATE = 48000
         
         // Intervalles de veille adaptatifs (en secondes)
-        private const val INTERVAL_CHARGING_HIGH_BATTERY = 18L // 15-20s
+        private const val INTERVAL_CHARGING_HIGH_BATTERY = 15L // 15-20s
         private const val INTERVAL_HIGH_BATTERY = 37L // 30-45s  
         private const val INTERVAL_MEDIUM_BATTERY = 75L // 60-90s
         private const val INTERVAL_LOW_BATTERY = 300L // 5 minutes
@@ -59,6 +59,7 @@ class ProactiveBroadcastWorker(
     private var emissionCount = 0
 
     override suspend fun doWork(): Result {
+    try {
         sessionStartTime = System.currentTimeMillis()
         isActive = true
         emissionCount = 0
@@ -155,6 +156,9 @@ class ProactiveBroadcastWorker(
             scheduleNextSession(privacyLevel)
 
             return Result.success(createOutputData())
+    } finally {
+        cleanup()
+    }
 
         } catch (e: Exception) {
             logRepository.logError("Erreur ProactiveBroadcastWorker: ${e.message}")
@@ -305,7 +309,8 @@ class ProactiveBroadcastWorker(
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
             .setRequiresBatteryNotLow(true)
-            .setRequiresDeviceIdle(false) // Peut émettre même si l'appareil est utilisé
+            .setRequiresDeviceIdle(false)
+            .setRequiresStorageNotLow(true) // Peut émettre même si l'appareil est utilisé
             .build()
 
         val inputData = Data.Builder()

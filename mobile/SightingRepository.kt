@@ -1,3 +1,4 @@
+import androidx.room.Index
 package com.ecoguard.app.repository
 
 import android.content.Context
@@ -23,6 +24,7 @@ class SightingRepository(
      * Enregistre ou met à jour une observation de partition.
      * Si la partition a déjà été observée, met à jour la position et le timestamp.
      */
+    @Transaction
     suspend fun recordSighting(
         partitionUuid: String,
         latitude: Double,
@@ -213,7 +215,13 @@ class SightingRepository(
 /**
  * Entité Room représentant une observation de partition.
  */
-@Entity(tableName = "sighting_table")
+@Entity(
+    tableName = "sighting_table",
+    indices = [
+        Index(value = ["timestamp"]),
+        Index(value = ["reported"])
+    ]
+)
 data class Sighting(
     @PrimaryKey val partitionUuid: String,
     val timestamp: Long,
