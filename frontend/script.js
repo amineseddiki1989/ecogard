@@ -10,9 +10,161 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form handlers
     initForms();
     
+    // Initialize API client
+    initApiClient();
+    
     // Show login modal on page load (commented out for demo)
     // showLoginModal();
 });
+
+// API Configuration
+const API_BASE_URL = 'http://localhost:8080/api/v1';
+let authToken = localStorage.getItem('auth_token');
+
+// API Client for backend communication
+const apiClient = {
+    // Authentication
+    login: async (email, password) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Échec de la connexion');
+            }
+            
+            const data = await response.json();
+            authToken = data.token;
+            localStorage.setItem('auth_token', authToken);
+            return data;
+        } catch (error) {
+            console.error('Erreur de connexion:', error);
+            throw error;
+        }
+    },
+    
+    // Get user devices
+    getDevices: async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/devices`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Échec de la récupération des appareils');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Erreur lors de la récupération des appareils:', error);
+            throw error;
+        }
+    },
+    
+    // Report device as stolen
+    reportTheft: async (theftReport) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/theft-reports`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify(theftReport)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Échec de la déclaration de vol');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Erreur lors de la déclaration de vol:', error);
+            throw error;
+        }
+    },
+    
+    // Get observations for a device
+    getObservations: async (deviceId) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/observations/device/${deviceId}`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Échec de la récupération des observations');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Erreur lors de la récupération des observations:', error);
+            throw error;
+        }
+    },
+    
+    // Get notifications
+    getNotifications: async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/notifications`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Échec de la récupération des notifications');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Erreur lors de la récupération des notifications:', error);
+            throw error;
+        }
+    }
+};
+
+// Initialize API client and load initial data
+function initApiClient() {
+    // Check if user is authenticated
+    if (authToken) {
+        // Load user devices
+        apiClient.getDevices()
+            .then(devices => {
+                console.log('Appareils chargés:', devices);
+                // Update UI with devices
+                // updateDevicesList(devices);
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement des appareils:', error);
+                // Handle authentication error
+                if (error.message.includes('401')) {
+                    localStorage.removeItem('auth_token');
+                    authToken = null;
+                    showLoginModal();
+                }
+            });
+            
+        // Load notifications
+        apiClient.getNotifications()
+            .then(notifications => {
+                console.log('Notifications chargées:', notifications);
+                // Update UI with notifications
+                // updateNotifications(notifications);
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement des notifications:', error);
+            });
+    }
+}
 
 // Initialize Leaflet maps
 function initMaps() {
@@ -100,6 +252,9 @@ function initNavigation() {
     // Logout button
     document.getElementById('logout-btn').addEventListener('click', function(e) {
         e.preventDefault();
+        // Clear authentication
+        localStorage.removeItem('auth_token');
+        authToken = null;
         showLoginModal();
     });
 }
@@ -136,9 +291,33 @@ function initForms() {
         theftReportForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Show success modal
-            const successModal = new bootstrap.Modal(document.getElementById('theftReportSuccessModal'));
-            successModal.show();
+            // Get form data
+            const deviceId = document.getElementById('device-select').value;
+            const theftDate = document.getElementById('theft-date').value;
+            const theftLocation = document.getElementById('theft-location').value;
+            const theftCircumstances = document.getElementById('theft-circumstances').value;
+            
+            // Create theft report object
+            const theftReport = {
+                deviceId,
+                theftDate,
+                location: theftLocation,
+                circumstances: theftCircumstances
+            };
+            
+            // Submit to API
+            apiClient.reportTheft(theftReport)
+                .then(response => {
+                    console.log('Vol déclaré avec succès:', response);
+                    
+                    // Show success modal
+                    const successModal = new bootstrap.Modal(document.getElementById('theftReportSuccessModal'));
+                    successModal.show();
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la déclaration de vol:', error);
+                    showAlert('Erreur lors de la déclaration de vol. Veuillez réessayer.', 'danger');
+                });
         });
     }
     
@@ -157,12 +336,32 @@ function initForms() {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Hide login modal
-            const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
-            loginModal.hide();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
             
-            // Navigate to dashboard
-            navigateToPage('dashboard');
+            // Authenticate with API
+            apiClient.login(email, password)
+                .then(response => {
+                    console.log('Connexion réussie:', response);
+                    
+                    // Hide login modal
+                    const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+                    loginModal.hide();
+                    
+                    // Initialize API client to load data
+                    initApiClient();
+                    
+                    // Navigate to dashboard
+                    navigateToPage('dashboard');
+                })
+                .catch(error => {
+                    console.error('Erreur de connexion:', error);
+                    // Show error message in the form
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'alert alert-danger';
+                    errorDiv.textContent = 'Email ou mot de passe incorrect';
+                    loginForm.prepend(errorDiv);
+                });
         });
     }
     
